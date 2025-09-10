@@ -10,9 +10,14 @@ CFG构建器测试用例
 - 复杂控制流
 """
 
+import sys
+import os
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 import unittest
 import tempfile
-import os
 from unittest.mock import Mock, patch
 import clang.cindex
 

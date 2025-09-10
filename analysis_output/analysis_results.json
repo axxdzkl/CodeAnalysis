@@ -1,0 +1,19 @@
+{
+  "source_file": "C:\\Users\\zkl\\AppData\\Local\\Temp\\tmpznf021kw\\test.c",
+  "functions": [
+    "test_func"
+  ],
+  "statistics": {
+    "total_functions": 1,
+    "total_blocks": 3,
+    "total_calls": 0
+  },
+  "coupling_statistics": {
+    "total_functions": 1,
+    "avg_coupling": 1.0,
+    "max_coupling": 1,
+    "coupling_distribution": {
+      "low": 1
+    }
+  }
+}

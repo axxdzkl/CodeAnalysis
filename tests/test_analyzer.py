@@ -4,9 +4,14 @@
 测试完整的分析流程和各模块的集成
 """
 
+import sys
+import os
+
+# Add src to Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+
 import unittest
 import tempfile
-import os
 import shutil
 from unittest.mock import Mock, patch
 
