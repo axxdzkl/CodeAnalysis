@@ -106,9 +106,11 @@ class CFGBuilder:
                     else:
                         logger.warning(f"Parse warning: {diag.spelling}")
             
-            # 遍历所有函数
+            # 遍历所有函数，只处理用户定义的函数
             for node in self.tu.cursor.walk_preorder():
-                if node.kind == CursorKind.FUNCTION_DECL and node.is_definition():
+                if (node.kind == CursorKind.FUNCTION_DECL and 
+                    node.is_definition() and 
+                    self._is_user_function(node)):
                     logger.info(f"Processing function: {node.spelling}")
                     self._process_function(node)
             
@@ -117,6 +119,59 @@ class CFGBuilder:
         except Exception as e:
             logger.error(f"Error building CFG: {str(e)}")
             raise
+    
+    def _is_user_function(self, func_node: Any) -> bool:
+        """
+        判断是否为用户定义的函数（排除系统函数）
+        
+        Args:
+            func_node: 函数AST节点
+            
+        Returns:
+            bool: 是否为用户函数
+        """
+        # 获取函数位置
+        if not func_node.location or not func_node.location.file:
+            return False
+            
+        # 只处理当前源文件中的函数
+        func_file = func_node.location.file.name
+        if not func_file.endswith(self.source_file.split('/')[-1].split('\\')[-1]):
+            return False
+            
+        # 排除常见的系统函数名前缀
+        func_name = func_node.spelling
+        system_prefixes = [
+            '__',           # 系统内部函数
+            '_CRT',         # Windows CRT
+            '_acrt',        # Windows ACRT
+            '_stdio',       # stdio内部
+            '_local',       # 本地化函数
+            '_invoke',      # 调用相关
+            '_invalid',     # 错误处理
+            '_report',      # 报告函数
+            '_security'     # 安全函数
+        ]
+        
+        for prefix in system_prefixes:
+            if func_name.startswith(prefix):
+                return False
+                
+        # 排除常见的标准库函数
+        system_functions = {
+            'malloc', 'free', 'calloc', 'realloc',  # 内存管理
+            'printf', 'scanf', 'sprintf', 'sscanf',  # 输入输出
+            'fopen', 'fclose', 'fread', 'fwrite',    # 文件操作
+            'strlen', 'strcpy', 'strcmp', 'strcat',  # 字符串
+            'memcpy', 'memset', 'memcmp',            # 内存操作
+            'exit', 'abort', 'atexit',               # 程序控制
+            'rand', 'srand', 'time',                 # 其他常用函数
+        }
+        
+        if func_name in system_functions:
+            return False
+            
+        return True
     
     def _process_function(self, func_node: Any):
         """

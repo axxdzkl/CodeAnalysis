@@ -6,6 +6,7 @@ matplotlib>=3.5.0
 pydot>=1.4.0
 graphviz>=0.20.0
 pydotplus>=2.0.2
+python-igraph>=0.10.0
 
 # 测试相关
 pytest>=7.0.0

@@ -66,10 +66,16 @@ class CallGraphBuilder:
         logger.info(f"Call graph built with {self.call_graph.number_of_nodes()} functions")
         return self.call_graph
     
+    def _analyze_function_calls(self):
+        """如果需要额外的函数调用分析，在这里实现"""
+        # 这个方法由_collect_function_definitions中的逻辑处理
+        pass
+    
     def _collect_function_definitions(self):
         """收集所有函数定义和声明"""
         def visit_node(node, current_function=None):
-            if node.kind == CursorKind.FUNCTION_DECL:
+            if (node.kind == CursorKind.FUNCTION_DECL and 
+                self._is_user_function(node)):
                 func_info = self._extract_function_info(node)
                 self.functions[func_info.name] = func_info
                 self.call_graph.add_node(func_info.name, function_info=func_info)
@@ -205,6 +211,73 @@ class CallGraphBuilder:
         self.stats['defined_functions'] = sum(1 for f in self.functions.values() if f.is_definition)
         self.stats['direct_calls'] = sum(1 for c in self.function_calls if c.call_type == 'direct')
         self.stats['indirect_calls'] = sum(1 for c in self.function_calls if c.call_type != 'direct')
+    
+    def _is_user_function(self, func_node: Any) -> bool:
+        """
+        判断是否为用户定义的函数（排除系统函数）
+        
+        Args:
+            func_node: 函数AST节点
+            
+        Returns:
+            bool: 是否为用户函数
+        """
+        # 获取函数位置
+        if not func_node.location or not func_node.location.file:
+            return False
+            
+        # 只处理当前源文件中的函数（不是头文件）
+        func_file = func_node.location.file.name
+        if '.h' in func_file or 'include' in func_file.lower():
+            return False
+            
+        # 排除常见的系统函数名前缀
+        func_name = func_node.spelling
+        system_prefixes = [
+            '__',           # 系统内部函数
+            '_CRT',         # Windows CRT
+            '_acrt',        # Windows ACRT
+            '_stdio',       # stdio内部
+            '_local',       # 本地化函数
+            '_invoke',      # 调用相关
+            '_invalid',     # 错误处理
+            '_report',      # 报告函数
+            '_security',    # 安全函数
+            '_v',           # 可变参数版本
+            '_w',           # 宽字符版本
+            '_s',           # 安全版本
+            '_p',           # printf类型
+            '_f',           # 文件操作类型
+            '_sn',          # 限定长度版本
+        ]
+        
+        for prefix in system_prefixes:
+            if func_name.startswith(prefix):
+                return False
+                
+        # 排除常见的标准库函数
+        system_functions = {
+            'malloc', 'free', 'calloc', 'realloc',  # 内存管理
+            'printf', 'scanf', 'sprintf', 'sscanf',  # 输入输出
+            'fopen', 'fclose', 'fread', 'fwrite',    # 文件操作
+            'strlen', 'strcpy', 'strcmp', 'strcat',  # 字符串
+            'memcpy', 'memset', 'memcmp',            # 内存操作
+            'exit', 'abort', 'atexit',               # 程序控制
+            'rand', 'srand', 'time',                 # 其他常用函数
+            # printf类型函数
+            'vprintf', 'vfprintf', 'vsprintf', 'vsnprintf',
+            'wprintf', 'fwprintf', 'swprintf',
+            'wscanf', 'fwscanf', 'swscanf',
+            # 字符类型函数
+            'fgetc', 'fputc', 'getc', 'putc', 'getchar', 'putchar',
+            'fgets', 'fputs', 'gets', 'puts',
+            'ungetc', 'fgetwc', 'fputwc', 'getwc', 'putwc',
+        }
+        
+        if func_name in system_functions:
+            return False
+            
+        return True
     
     def get_callers(self, function_name: str) -> Set[str]:
         """获取调用指定函数的函数列表"""

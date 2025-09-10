@@ -5,8 +5,6 @@
  * 用于快速测试静态分析功能。
  */
 
-#include <stdio.h>
-
 // 全局变量
 int counter = 0;
 
@@ -65,24 +63,16 @@ int fibonacci(int n) {
  * 主函数
  */
 int main() {
-    printf("Simple Example Program\n");
-    
     int x = 5;
     int y = 10;
     
     int sum = add(x, y);
-    printf("Sum: %d\n", sum);
     
     int maximum = max(x, y);
-    printf("Max: %d\n", maximum);
     
     int fact = factorial(5);
-    printf("Factorial of 5: %d\n", fact);
     
     int fib = fibonacci(8);
-    printf("Fibonacci of 8: %d\n", fib);
-    
-    printf("Total function calls: %d\n", counter);
     
     return 0;
 }
