@@ -1,0 +1,15 @@
+{
+  "anchors": {
+    "variables": [
+      {
+        "name": "user_input",
+        "semantic": "用户输入的商品基础金额"
+      },
+      {
+        "name": "output_total",
+        "semantic": "系统计算后的最终应收总额"
+      }
+    ],
+    "functions": []
+  }
+}

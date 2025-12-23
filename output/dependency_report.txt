@@ -1,0 +1,29 @@
+======================================================================
+Dependency Analysis Report
+======================================================================
+
+Total Variables: 9
+Total Functions: 3
+
+Variable Dependencies by Type:
+  - function_call: 5
+  - arithmetic: 2
+  - return: 1
+
+Total Function Calls: 2
+
+Variable Dependency Details:
+----------------------------------------------------------------------
+  calculate_tax --[return]--> tax (context: calculate_tax)
+  raw_val --[function_call]--> base_price (context: process_transaction)
+  final_price --[arithmetic]--> raw_val (context: process_transaction)
+  final_price --[arithmetic]--> tax_val (context: process_transaction)
+  user_input --[function_call]--> input_amount (context: main)
+  user_input --[function_call]--> final_price (context: main)
+  output_total --[function_call]--> input_amount (context: main)
+  output_total --[function_call]--> final_price (context: main)
+
+Function Call Details:
+----------------------------------------------------------------------
+  process_transaction --> calculate_tax
+  main --> process_transaction

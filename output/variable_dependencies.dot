@@ -1,0 +1,21 @@
+digraph VariableDependencies {
+  rankdir=LR;
+  node [shape=box];
+  "calculate_tax";
+  "tax";
+  "raw_val";
+  "base_price";
+  "final_price";
+  "tax_val";
+  "user_input";
+  "input_amount";
+  "output_total";
+  "calculate_tax" -> "tax" [label="return", color=purple];
+  "raw_val" -> "base_price" [label="function_call", color=orange];
+  "final_price" -> "raw_val" [label="arithmetic", color=blue];
+  "final_price" -> "tax_val" [label="arithmetic", color=blue];
+  "user_input" -> "input_amount" [label="function_call", color=orange];
+  "user_input" -> "final_price" [label="function_call", color=orange];
+  "output_total" -> "input_amount" [label="function_call", color=orange];
+  "output_total" -> "final_price" [label="function_call", color=orange];
+}
